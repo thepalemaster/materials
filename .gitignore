@@ -1,0 +1,11 @@
+withQT.*
+trash.cpp
+materialsQ.*
+*.json
+Makefile
+/materialsQ*
+/build
+/CMakeFiles
+CMakeCache.txt
+*.cmake
+*.kdev4
