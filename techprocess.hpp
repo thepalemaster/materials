@@ -5,10 +5,11 @@
 
 #include <QRegExp>
 
+#include "gui_techprocess.hpp"
 #include "measurement.hpp"
 
 
-
+  
 
 class MaterialEntry
 {
@@ -26,6 +27,7 @@ public:
     void calculate (double input, Measurement::Measure inputMeasure);
     QString* getLabels();
     void printToConsole();
+    void generateGui (TechprocessViewer &viewer);
 };
 
 class Operation
@@ -39,6 +41,7 @@ public:
     void addAlternative(MaterialEntry *alt);
     void addMaterial(MaterialEntry *material);
     void printToConsole();
+    void generateGui (TechprocessViewer &viewer);
 };
 
 
@@ -55,4 +58,5 @@ public:
     void addMaterial(MaterialEntry *material);
     void addAlternative(MaterialEntry *alt);
     void printToConsole();
+    void generateGui (TechprocessViewer &viewer);
 };

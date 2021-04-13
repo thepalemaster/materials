@@ -13,7 +13,7 @@ int main (int argc, char *argv[])
     std::cout <<"!";
     QApplication app(argc, argv);
     Parser *mainparser = new Parser("data");
-    MaterialViewer *mv = new MaterialViewer();
+    TechprocessViewer *mv = new TechprocessViewer();
     mainparser->printToConsole();
     mv->show();
     

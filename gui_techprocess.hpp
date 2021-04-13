@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
+#include "techprocess.hpp"
 
 #include "techprocess.hpp"
     
@@ -25,9 +26,16 @@ public:
 class TechprocessViewer: public QWidget
 {
 private:
-    QList<OperationViewer> operations;
     void addOperation(const Operation &oper);
+    int currentRow = 0;
+    int currentColumn = 0;
+
 public:
     TechprocessViewer(const Techprocess &tech, QWidget *parent = nullptr);
+    TechprocessViewer(QWidget *parent = nullptr);
     void bindTech(const Techprocess &tech);
+    void addOperation(QString name);
+    void addWidget();
+    
+
 };
