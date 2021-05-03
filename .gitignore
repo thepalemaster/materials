@@ -2,8 +2,10 @@ withQT.*
 trash.cpp
 materialsQ.*
 *.json
+CMakeLists.txt.user
 Makefile
 /materialsQ*
+.cache/
 /build
 /CMakeFiles
 CMakeCache.txt

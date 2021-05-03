@@ -14,7 +14,10 @@ private:
         TECHPROCESS,
     };
     PreviousLine previous = NONE;
-    QList<Techprocess> techlist;
+    std::vector<Techprocess*> techlist;
+    
+    int counter = 0;
+    
     QStringList m_captured;
     QRegExp m_materialLine;
     bool isOperation (const QString &operation);
@@ -30,6 +33,6 @@ public:
     Parser(const QString &directory);
     ~Parser();
     void parseLine(const QString &line);
-    QList<Techprocess> parseResult ();
+    Techprocess* parseResult ();
     void printToConsole();
 };

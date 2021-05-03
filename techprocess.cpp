@@ -1,4 +1,4 @@
-#include "techprocess.hpp"
+#include "common_tech.hpp"
 
 
 #include <iostream>
@@ -6,7 +6,9 @@
 //материал
 MaterialEntry::MaterialEntry(const QString name, double expense, const QString& measure)
 :m_name(name), m_measure1{Measurement::measureMap.at(measure)},m_measure2{Measurement::measureMap.at("шт")}, m_expense(expense)
-{}
+{
+    
+}
 
 MaterialEntry::MaterialEntry (const QString name, double expense, const Measurement::Measure &measure1, const Measurement::Measure &measure2)
 :m_name(name),m_measure1(measure1), m_measure2(measure2), m_expense(expense)
@@ -26,13 +28,26 @@ void MaterialEntry::addAlternative(MaterialEntry *alternative)
 
 void MaterialEntry::printToConsole()
 {
-    std::cout << m_name.toStdString() << '\t'<< '\t'<< m_expense << '\t' <<m_measure1.m_shortName << '/' << m_measure2.m_shortName<< '\n';
+    std::cout << m_name.toStdString() << '\t'<< '\t'<< m_expense << '\t' <<m_measure1.m_shortName.toStdString() << '/' << m_measure2.m_shortName.toStdString()<< '\n';
     if (m_alt)
     {
         std::cout << "или" << '\n';
         m_alt->printToConsole();
     }
 }
+
+void MaterialEntry::transferInfo(TechprocessViewer *viewer)
+{
+    if(m_alt)
+    {
+        viewer->addMaterial(m_name, m_expense, m_measure1, m_measure2, m_alt);
+    }
+    else
+    {
+        viewer->addMaterial(m_name, m_expense,  m_measure1, m_measure2);
+    }
+}
+
 
 
 //операция
@@ -57,6 +72,15 @@ void Operation::printToConsole()
     }
 }
 
+void Operation::transferInfo(TechprocessViewer *viewer)
+{
+    viewer->addOperation(m_name);
+    std::vector<MaterialEntry*>::const_iterator i;
+    for (i = materials.begin(); i != materials.end(); ++i)
+    {
+        (*i)->transferInfo(viewer);
+    } 
+}
     
 void Operation::addMaterial(MaterialEntry *material)
 {
@@ -93,24 +117,35 @@ void Techprocess::addMaterial(MaterialEntry *material)
 
 void Techprocess::addAlternative(MaterialEntry *alternative)
 {
-    m_operations.back()->addAlternative(alternative); //сделать чтобы напрямую
+    m_operations.back()->addAlternative(alternative);
 }
 
 void Techprocess::printToConsole()
 {
     std::cout << "Техпроцесс " << m_name.toStdString()<<'\n';
-    QList<Operation*>::const_iterator i;
-    for (i = m_operations.constBegin(); i != m_operations.constEnd(); ++i)
+    std::vector<Operation*>::const_iterator i;
+    for (i = m_operations.begin(); i != m_operations.end(); ++i)
     {
         (*i)->printToConsole();
     }
     
 }
 
+void Techprocess::transferInfo(TechprocessViewer* viewer)
+{
+    viewer->addNameTech(m_name);
+    std::vector<Operation*>::const_iterator i;
+    for (i = m_operations.cbegin(); i != m_operations.cend(); ++i)
+    {
+        (*i)->transferInfo(viewer);
+    }
+}
+
+
 Techprocess::~Techprocess()
 {
-    QList<Operation*>::const_iterator i;
-    for (i = m_operations.constBegin(); i != m_operations.constEnd(); ++i)
+    std::vector<Operation*>::const_iterator i;
+    for (i = m_operations.cbegin(); i != m_operations.cend(); ++i)
     {
         delete *i;
     }

@@ -4,7 +4,7 @@ set(projectName materialsQ)
 
 #add_subdirectory(compile-time-regular-expressions/)
 
-project(${projectName})
+project(${projectName} VERSION 0.1.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -33,7 +33,7 @@ measurement.cpp
 gui_techprocess.cpp
 )
 
-install(TARGETS ${projectName} RUNTIME DESTINATION bin)
+#install(TARGETS ${projectName} RUNTIME DESTINATION bin)
 
 target_include_directories(${projectName} PUBLIC  ${Qt5_INCLUDE_DIR} )#)${Qt5Widgets_INCLUDE_DIRS})#)${Qt5Core_INCLUDE_DIR})
 target_link_libraries(${projectName} Qt5::Core Qt5::Gui Qt5::Widgets)

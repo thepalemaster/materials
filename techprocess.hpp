@@ -4,18 +4,14 @@
 
 
 #include <QRegExp>
-
-#include "gui_techprocess.hpp"
 #include "measurement.hpp"
 
-
-  
+class TechprocessViewer;
 
 class MaterialEntry
 {
 private:
     QString m_name;
-    //сделать указателями
     const Measurement::Measure &m_measure1;
     const Measurement::Measure &m_measure2;
     double m_expense;
@@ -27,7 +23,7 @@ public:
     void calculate (double input, Measurement::Measure inputMeasure);
     QString* getLabels();
     void printToConsole();
-    void generateGui (TechprocessViewer &viewer);
+    void transferInfo (TechprocessViewer *viewer);
 };
 
 class Operation
@@ -41,7 +37,7 @@ public:
     void addAlternative(MaterialEntry *alt);
     void addMaterial(MaterialEntry *material);
     void printToConsole();
-    void generateGui (TechprocessViewer &viewer);
+    void transferInfo (TechprocessViewer *viewer);
 };
 
 
@@ -49,7 +45,7 @@ class Techprocess
 {
 private:
     QString m_name;
-    QList<Operation*> m_operations;
+    std::vector<Operation*> m_operations;
     
 public:
     Techprocess (QString name);
@@ -58,5 +54,5 @@ public:
     void addMaterial(MaterialEntry *material);
     void addAlternative(MaterialEntry *alt);
     void printToConsole();
-    void generateGui (TechprocessViewer &viewer);
+    void transferInfo (TechprocessViewer *viewer);
 };

@@ -21,17 +21,18 @@ namespace Measurement
     class Measure
     {
     public:
-        const char *m_shortName;
-        Measure(const char *shortName, QString name, Type type, double coef):
+        QString m_shortName;
+        Type m_type;
+        Measure(QString shortName, QString name, Type type, double coef):
         m_shortName(shortName),
-        m_name(name),
         m_type(type),
+        m_name(name),
         m_coefficient(coef)
         {}
+
         
     private:
         QString m_name;
-        Type m_type;
         double m_coefficient;
     };
     

@@ -8,6 +8,18 @@
 #include <iostream>
 
 
+Parser::Parser(const QString& directory)
+{
+    //регулярное выражение чтобы вычленять данные по операциям
+    QString rx = 
+    "^ *(.+) +(\\d+[,\\.]?\\d*) {0,5}("
+    + Measurement::regExpMeasure + ")\\/("
+    + Measurement::regExpMeasure + ") *$";
+    //m_materialLine.setPatternSyntax(QRegExp::RegExp2);
+    m_materialLine.setPattern(rx);
+    m_materialLine.setCaseSensitivity(Qt::CaseInsensitive);
+    scanDir(directory);
+}
 
 void Parser::scanDir(const QString& directory)
 {
@@ -18,54 +30,33 @@ void Parser::scanDir(const QString& directory)
     {
         return;
     }
-    QStringList list = dir.entryList();
-    QStringList::const_iterator constIterator;
+    QFileInfoList list = dir.entryInfoList();
+    QFileInfoList::const_iterator constIterator;
     for (constIterator = list.constBegin(); constIterator != list.constEnd(); ++constIterator)
     {
-        
-        QString tempstring = directory + '/' + *constIterator; 
-        QFile file(tempstring);
-        std::cout << file.fileName().toStdString()<<'\n';
+        QFile file(constIterator->absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-            std::cout << "Файл"<< constIterator->toStdString();
+        {
+            continue;
+        }
         QTextStream in(&file);
         while (!in.atEnd())
         {
-            QString currentLine = in.readLine();
-            parseLine(currentLine);
+            parseLine(in.readLine());
         }
+        std::cout << file.fileName().toStdString()<<'\n';
     }
 }
 
-Parser::Parser(const QString& directory)
-{
-    //регулярное выражение чтобы вычленять данные по операциям
-    QString rx = 
-    "^ *(.*) +(\\d+[,\\.]?\\d*) {0,5}("
-    + Measurement::regExpMeasure + ")(\\/("
-    + Measurement::regExpMeasure + "))? *$";
-    //rx = "(\\d+[,\\.]?\\d*)";
-    m_materialLine.setPatternSyntax(QRegExp::RegExp2);
-    m_materialLine.setPattern(rx);
-    m_materialLine.setCaseSensitivity(Qt::CaseInsensitive);
-    
-    if (m_materialLine.isValid())
-        std::cout<<"Регулярка верная!"<<'\n';
-    else
-        std::cout<<rx.toStdString()<<'\n';
-    scanDir(directory);
-}
-
-
 void Parser::addNewTech(const QString &name)
 {
-    techlist.push_back(Techprocess(name));
+    techlist.push_back(new Techprocess(name));
 }
 
 
 void Parser::addNewOperation(const QString &operation)
 {
-    techlist.back().addOperation(operation);
+    techlist.back()->addOperation(operation);
 }
 
 MaterialEntry * Parser::getMaterial()
@@ -81,30 +72,18 @@ MaterialEntry * Parser::getMaterial()
     {
         num = m_captured.at(1).toDouble();
     }
-    MaterialEntry *entry;
-    if (m_captured.length() == 3)
-    {
-        entry = new MaterialEntry(
-            m_captured.at(0), 
-            num,
-            Measurement::measureMap.at(m_captured.at(2)),
-            Measurement::measureMap.at("шт"));
-    }
-    else
-    {
-        entry = new MaterialEntry(
+    MaterialEntry *entry = new MaterialEntry(
             m_captured.at(0), 
             num,
             Measurement::measureMap.at(m_captured.at(2)),
             Measurement::measureMap.at(m_captured.at(3)));
-    }
     return entry;
 }
 
 
 void Parser::addNewMatetial()
 {
-    techlist.back().addMaterial(getMaterial());
+    techlist.back()->addMaterial(getMaterial());
 }
 
 bool Parser::isOperation (const QString &operation)
@@ -120,6 +99,7 @@ bool Parser::isOperation (const QString &operation)
 
 bool Parser::isMaterialDef(const QString &material)
 {
+    std::cout << "^"<<'\n';
     m_materialLine.indexIn(material);
     QStringList list = m_materialLine.capturedTexts();
     if (list.at(0).isEmpty())
@@ -127,14 +107,14 @@ bool Parser::isMaterialDef(const QString &material)
         return false;
     }
     m_captured.clear();
-    if(list.at(5).isEmpty())
+    m_captured << list.at(1) << list.at(2) << list.at(3) << list.at(4);
+    QList<QString>::const_iterator i;
+    std::cout << '\n';
+    for (i = m_captured.cbegin()+1; i != m_captured.cend(); ++i)
     {
-        m_captured << list.at(1) << list.at(2) << list.at(3);
+        std::cout << i->toStdString() << '\n';
     }
-    else
-    {
-        m_captured << list.at(1) << list.at(2) << list.at(3) << list.at(5);
-    }
+    
     return true;
 }
                 
@@ -148,14 +128,13 @@ void Parser::parseLine(const QString &line)
         std::cout << "Есть техпроцесс";
     }
     //если техпроцесс не инициализирован, то все строки ситаются просто комментариями
-    else if (techlist.isEmpty())
+    else if (techlist.empty())
     {
         previous = NONE;
     }
+    //если строка пустая, то ничего не делается
     else if (line.isEmpty())
-    {
-        //если строка пустая, то ничего не делается
-    }
+    {}
     //проверка является ли стока объявлением операции
     else if (isOperation(line))
     {
@@ -167,7 +146,8 @@ void Parser::parseLine(const QString &line)
     {
         if(isMaterialDef(line))
         {
-            techlist.back().addAlternative(getMaterial());
+            std::cout<<"OR";
+            techlist.back()->addAlternative(getMaterial());
             previous = MATERIAL;
         }
         else
@@ -176,7 +156,7 @@ void Parser::parseLine(const QString &line)
         }
     }
     //проверка ключевого слова "или", работает только если приведущей записью был материал
-    else if (!line.compare("или", Qt::CaseInsensitive) && previous == MATERIAL)
+    else if (line.compare("или", Qt::CaseInsensitive) == 0 && previous == MATERIAL) //возможно стоит убирать пробелы
     {
         previous = OR_MATERIAL;
         //на следующем шаге  которая запоминается как допустимая замена приведущей
@@ -185,6 +165,7 @@ void Parser::parseLine(const QString &line)
     else if (isMaterialDef(line))
     {
         addNewMatetial();
+        std::cout << "[m+]";
         previous = MATERIAL;
     }
     else
@@ -193,15 +174,17 @@ void Parser::parseLine(const QString &line)
     }
 }
 
-QList<Techprocess> Parser::parseResult ()
+Techprocess* Parser::parseResult ()
 {
-    return techlist;
+    if(techlist.empty())
+        std::cout << "Пусто";
+    return techlist[0];
 }
 
 void Parser::printToConsole()
 {
-    QList<Techprocess>::iterator i;
-    for (i = techlist.begin(); i != techlist.end(); ++i)
+    //std::vector:iterator i;
+    for (auto i:techlist )
     {
         i->printToConsole();
     }
