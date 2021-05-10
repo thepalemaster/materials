@@ -34,5 +34,6 @@ public:
     ~Parser();
     void parseLine(const QString &line);
     Techprocess* parseResult ();
+    std::vector<Techprocess*>* getResult ();
     void printToConsole();
 };

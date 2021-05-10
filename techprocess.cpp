@@ -1,5 +1,4 @@
-#include "common_tech.hpp"
-
+#include "gui_techprocess.hpp"
 
 #include <iostream>
 

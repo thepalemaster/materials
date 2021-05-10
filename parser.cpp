@@ -21,6 +21,15 @@ Parser::Parser(const QString& directory)
     scanDir(directory);
 }
 
+Parser::~Parser()
+{
+    for (auto item: techlist)
+    {
+       delete item;
+    }
+}
+
+
 void Parser::scanDir(const QString& directory)
 {
 
@@ -99,7 +108,6 @@ bool Parser::isOperation (const QString &operation)
 
 bool Parser::isMaterialDef(const QString &material)
 {
-    std::cout << "^"<<'\n';
     m_materialLine.indexIn(material);
     QStringList list = m_materialLine.capturedTexts();
     if (list.at(0).isEmpty())
@@ -109,7 +117,6 @@ bool Parser::isMaterialDef(const QString &material)
     m_captured.clear();
     m_captured << list.at(1) << list.at(2) << list.at(3) << list.at(4);
     QList<QString>::const_iterator i;
-    std::cout << '\n';
     for (i = m_captured.cbegin()+1; i != m_captured.cend(); ++i)
     {
         std::cout << i->toStdString() << '\n';
@@ -165,7 +172,6 @@ void Parser::parseLine(const QString &line)
     else if (isMaterialDef(line))
     {
         addNewMatetial();
-        std::cout << "[m+]";
         previous = MATERIAL;
     }
     else
@@ -179,6 +185,12 @@ Techprocess* Parser::parseResult ()
     if(techlist.empty())
         std::cout << "Пусто";
     return techlist[0];
+}
+
+std::vector<Techprocess*>* Parser::getResult ()
+{
+    std::vector<Techprocess*>* ptr = &techlist;
+    return ptr;
 }
 
 void Parser::printToConsole()

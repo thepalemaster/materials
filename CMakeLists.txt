@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-set(projectName materialsQ)
+set(projectName materialsQt)
 
 #add_subdirectory(compile-time-regular-expressions/)
 
@@ -31,6 +31,7 @@ techprocess.cpp
 parser.cpp
 measurement.cpp
 gui_techprocess.cpp
+gui_techlist.cpp
 )
 
 #install(TARGETS ${projectName} RUNTIME DESTINATION bin)
