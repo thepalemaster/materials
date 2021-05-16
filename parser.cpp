@@ -95,6 +95,19 @@ void Parser::addNewMatetial()
     techlist.back()->addMaterial(getMaterial());
 }
 
+
+bool Parser::isTechprocess(const QString& techprocess)
+{
+    if(m_techprocessRegExp.indexIn(techprocess) < 0)
+    {
+        return false;
+    }
+    m_captured.clear();
+    m_captured <<  m_techprocessRegExp.cap(1);
+    return true;
+}
+
+
 bool Parser::isOperation (const QString &operation)
 {
         if ((operation[0].isDigit())&&
@@ -108,31 +121,22 @@ bool Parser::isOperation (const QString &operation)
 
 bool Parser::isMaterialDef(const QString &material)
 {
-    m_materialLine.indexIn(material);
-    QStringList list = m_materialLine.capturedTexts();
-    if (list.at(0).isEmpty())
+    if(m_materialLine.indexIn(material) < 0)
     {
         return false;
     }
     m_captured.clear();
-    m_captured << list.at(1) << list.at(2) << list.at(3) << list.at(4);
-    QList<QString>::const_iterator i;
-    for (i = m_captured.cbegin()+1; i != m_captured.cend(); ++i)
-    {
-        std::cout << i->toStdString() << '\n';
-    }
-    
+    m_captured << m_materialLine.cap(1) << m_materialLine.cap(2) << m_materialLine.cap(3) << m_materialLine.cap(4);
     return true;
 }
                 
 void Parser::parseLine(const QString &line)
 {
     //для инициализации техпроцесса необходимо ключевое слово "техпроцесс"
-    if (line.startsWith("техпроцесс", Qt::CaseInsensitive))
+    if (isTechprocess(line))
     {
-        addNewTech(line.right(7));
+        addNewTech(m_captured[0]);
         previous = TECHPROCESS;
-        std::cout << "Есть техпроцесс";
     }
     //если техпроцесс не инициализирован, то все строки ситаются просто комментариями
     else if (techlist.empty())
@@ -184,7 +188,7 @@ Techprocess* Parser::parseResult ()
 {
     if(techlist.empty())
         std::cout << "Пусто";
-    return techlist[0];
+    return techlist[1];
 }
 
 std::vector<Techprocess*>* Parser::getResult ()
@@ -195,7 +199,6 @@ std::vector<Techprocess*>* Parser::getResult ()
 
 void Parser::printToConsole()
 {
-    //std::vector:iterator i;
     for (auto i:techlist )
     {
         i->printToConsole();

@@ -140,6 +140,11 @@ void Techprocess::transferInfo(TechprocessViewer* viewer)
     }
 }
 
+QString Techprocess::getName()
+{
+    return m_name;
+}
+
 
 Techprocess::~Techprocess()
 {

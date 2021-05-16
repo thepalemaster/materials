@@ -3,22 +3,16 @@
 #include <iostream>
 
 
-
 TechprocessViewer::TechprocessViewer(QWidget *parent)
     :QWidget(parent)
 {
-    m_gridBox = new QGridLayout(this);
-    setLayout(m_gridBox);
     std::cout<<"Гуй9\n";    
 }
 
 TechprocessViewer::TechprocessViewer(Techprocess* tech, QWidget *parent)
     :QWidget(parent)
 {
-    m_gridBox = new QGridLayout(this);
-    setLayout(m_gridBox);
-    generateGui(tech);
-    std::cout<<"Гуй00\n";    
+    generateGui(tech);  
 }
 
 void TechprocessViewer::updateMaterials(double newValue, Measurement::Type measureType)
@@ -33,38 +27,16 @@ void TechprocessViewer::updateMaterials(double newValue, Measurement::Type measu
 
 void TechprocessViewer::generateGui(Techprocess* tech)
 {
+    m_gridBox = new QGridLayout(this);
+    m_dependanceBox = new QVBoxLayout();
+    m_gridBox->addLayout(m_dependanceBox, 0, 0, 1, -1);
     tech->transferInfo(this);
-    int column = 0;
     QLabel *measure;
     QLineEdit *lineEdit;
     for (auto it = m_usedDependance.begin(); it != m_usedDependance.end(); ++it)
     {
-        switch(*it)
-        {
-            case Measurement::Type::MASS:
-            {
-                measure = new QLabel("Масса в г:");
-                lineEdit = new QLineEdit();
-                break;
-            }
-            case Measurement::Type::VOLUME:
-                measure = new QLabel("Обём в л:");
-                lineEdit = new QLineEdit();
-                break;
-            case Measurement::Type::AREA:
-                measure = new QLabel("Площадь в дм<sup>2</sup>:");
-                lineEdit = new QLineEdit();
-                break;
-            case Measurement::Type::UNITS:
-                break;
-            case Measurement::Type::LENGTH:
-                measure = new QLabel("Длина в м:");
-                lineEdit = new QLineEdit();
-                break;
-            default:
-                continue;
-                break;
-        }
+        lineEdit = new QLineEdit();
+        measure = new QLabel(Measurement::inputLabel.at(*it));
         connect(lineEdit, &QLineEdit::editingFinished, this, [=](){
             QString inputText = lineEdit->text();
             bool condition;
@@ -75,11 +47,8 @@ void TechprocessViewer::generateGui(Techprocess* tech)
                 updateMaterials(number, *it);
             }
         });
-
-        m_gridBox->addWidget(measure, 0, column);
-        ++column;
-        m_gridBox->addWidget(lineEdit, 0, column);
-        ++column;
+        m_dependanceBox->addWidget(measure);
+        m_dependanceBox->addWidget(lineEdit);
     }
     
 }
@@ -105,15 +74,19 @@ void TechprocessViewer::addMaterial(QString name, double factor, const Measureme
     ++m_currentRow;
     QLabel *matName = new QLabel(name);
     QLabel *measureName1 = new QLabel(measure1.m_shortName);
-    QLabel *measureName2 = new QLabel(measure2.m_shortName);
     QLabel *factorLabel = new QLabel("0");
     m_gridBox->addWidget(matName, m_currentRow, 0);
     m_gridBox->addWidget(factorLabel, m_currentRow, 1);
     m_gridBox->addWidget(measureName1, m_currentRow, 2);
-    m_gridBox->addWidget(measureName2, m_currentRow, 3);
-    std::function <void(double)> func1= [factor, factorLabel](double newValue)
+    if (measure2.m_type == Measurement::UNITS)
+    {
+        factorLabel->setText(QString::number(factor));
+        return;
+    }
+    double coefficient = factor * measure1.m_coefficient / measure2.m_coefficient; 
+    std::function <void(double)> func1= [coefficient, factorLabel](double newValue)
     { 
-        double x = factor * newValue;
+        double x = coefficient * newValue;
         std::cout << "+";
         factorLabel->setText(QString::number(x));
         std::cout<<factorLabel->text().toStdString();

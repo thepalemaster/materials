@@ -21,7 +21,7 @@ class TechprocessViewer: public QWidget
 private:
     QVBoxLayout *m_mainBox;
     QGridLayout *m_gridBox;
-    QHBoxLayout *m_dependanceBox;
+    QVBoxLayout *m_dependanceBox;
     QMultiMap<Measurement::Type, std::function<void(double)>> m_changesMap;
     std::set<Measurement::Type> m_usedDependance;
     //задел на будущее для параметром которые зависят более чем от одного параметра

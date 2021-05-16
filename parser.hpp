@@ -20,8 +20,10 @@ private:
     
     QStringList m_captured;
     QRegExp m_materialLine;
+    QRegExp m_techprocessRegExp{"\\s*техпроцесс\\s+(.+)\\s*", Qt::CaseInsensitive};
     bool isOperation (const QString &operation);
     bool isMaterialDef(const QString &material);
+    bool isTechprocess(const QString &techprocess);
     void scanDir(const QString &directory);
     void addNewTech(const QString &name);
     void addNewOperation(const QString &operation);

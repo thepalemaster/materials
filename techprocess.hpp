@@ -55,4 +55,5 @@ public:
     void addAlternative(MaterialEntry *alt);
     void printToConsole();
     void transferInfo (TechprocessViewer *viewer);
+    QString getName();
 };
