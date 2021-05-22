@@ -17,7 +17,7 @@ private:
     double m_expense;
     MaterialEntry* m_alt = nullptr;
 public:
-    MaterialEntry(const QString name, double expense, const QString &measure);
+    MaterialEntry(const QString name, double expense, const Measurement::Measure &measure1, const Measurement::Measure &measure2, const QString &measure3);
     MaterialEntry(const QString name, double expense, const Measurement::Measure &measure1, const Measurement::Measure &measure2);
     void addAlternative(MaterialEntry *alt);
     void calculate (double input, Measurement::Measure inputMeasure);

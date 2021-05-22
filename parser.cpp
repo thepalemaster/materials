@@ -12,9 +12,15 @@ Parser::Parser(const QString& directory)
 {
     //регулярное выражение чтобы вычленять данные по операциям
     QString rx = 
+    "^\\s*(.+)\\s+(\\d+[,\\.]?\\d*)\\s{0,6}("
+    + Measurement::regExpMeasure + ")\\/("
+    + Measurement::regExpMeasure + ")\\s*$";
+    QString xx = "((\\s{0,4}d+[,\\.]?\\d*)\\s{0,4}("+ Measurement::regExpMeasure + "))?";
+    /*
     "^ *(.+) +(\\d+[,\\.]?\\d*) {0,5}("
     + Measurement::regExpMeasure + ")\\/("
     + Measurement::regExpMeasure + ") *$";
+    */
     //m_materialLine.setPatternSyntax(QRegExp::RegExp2);
     m_materialLine.setPattern(rx);
     m_materialLine.setCaseSensitivity(Qt::CaseInsensitive);

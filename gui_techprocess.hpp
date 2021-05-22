@@ -1,12 +1,16 @@
 #pragma once
 
+#include <QtWidgets/QApplication>
+#include <QClipboard>
+
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QVBoxLayout>
-#include "techprocess.hpp"
-#include <QMainWindow>
-
+#include <QtWidgets/QPushButton>
 #include <set>
+
+#include "techprocess.hpp"
+
 
 struct DependanceSignal
 {
@@ -19,7 +23,7 @@ class TechprocessViewer: public QWidget
 {
     Q_OBJECT
 private:
-    QVBoxLayout *m_mainBox;
+    QClipboard *copyBuffer;
     QGridLayout *m_gridBox;
     QVBoxLayout *m_dependanceBox;
     QMultiMap<Measurement::Type, std::function<void(double)>> m_changesMap;

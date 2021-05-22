@@ -1,5 +1,6 @@
 #include "gui_techprocess.hpp"
 
+
 #include <iostream>
 
 
@@ -12,6 +13,7 @@ TechprocessViewer::TechprocessViewer(QWidget *parent)
 TechprocessViewer::TechprocessViewer(Techprocess* tech, QWidget *parent)
     :QWidget(parent)
 {
+    copyBuffer = QApplication::clipboard();
     generateGui(tech);  
 }
 
@@ -24,7 +26,6 @@ void TechprocessViewer::updateMaterials(double newValue, Measurement::Type measu
      }
 }
 
-
 void TechprocessViewer::generateGui(Techprocess* tech)
 {
     m_gridBox = new QGridLayout(this);
@@ -33,6 +34,8 @@ void TechprocessViewer::generateGui(Techprocess* tech)
     tech->transferInfo(this);
     QLabel *measure;
     QLineEdit *lineEdit;
+    ++m_currentRow;
+    m_gridBox->setRowStretch(m_currentRow, 1);
     for (auto it = m_usedDependance.begin(); it != m_usedDependance.end(); ++it)
     {
         lineEdit = new QLineEdit();
@@ -41,7 +44,6 @@ void TechprocessViewer::generateGui(Techprocess* tech)
             QString inputText = lineEdit->text();
             bool condition;
             double number = inputText.toDouble(&condition);
-            std::cout << inputText.toStdString()<<'\n';
             if (condition)
             {
                 updateMaterials(number, *it);
@@ -55,17 +57,16 @@ void TechprocessViewer::generateGui(Techprocess* tech)
 
  void TechprocessViewer::addNameTech(QString name)
 {
-    ++m_currentRow;
-    QLabel *techname = new QLabel(name);
-    std::cout<<"Гуй5"<<"\n";  
-    m_gridBox->addWidget(techname, m_currentRow, 0);
+    //++m_currentRow;
+    QLabel *techname = new QLabel("<strong>" + name + "</strong>");
+    //std::cout<<"Гуй5"<<"\n";  
+    m_dependanceBox->addWidget(techname);
 }
 
  void TechprocessViewer::addOperation(QString name)
 {
-
     ++m_currentRow;
-    QLabel *opername = new QLabel(name);
+    QLabel *opername = new QLabel("<strong>" + name + "</strong>");
     m_gridBox->addWidget(opername, m_currentRow, 0, 1, 2);
 }
 
@@ -75,9 +76,11 @@ void TechprocessViewer::addMaterial(QString name, double factor, const Measureme
     QLabel *matName = new QLabel(name);
     QLabel *measureName1 = new QLabel(measure1.m_shortName);
     QLabel *factorLabel = new QLabel("0");
+    QPushButton *copyButton = new QPushButton("Скопировать");
     m_gridBox->addWidget(matName, m_currentRow, 0);
     m_gridBox->addWidget(factorLabel, m_currentRow, 1);
     m_gridBox->addWidget(measureName1, m_currentRow, 2);
+    m_gridBox->addWidget(copyButton, m_currentRow, 3);
     if (measure2.m_type == Measurement::UNITS)
     {
         factorLabel->setText(QString::number(factor));
@@ -87,13 +90,13 @@ void TechprocessViewer::addMaterial(QString name, double factor, const Measureme
     std::function <void(double)> func1= [coefficient, factorLabel](double newValue)
     { 
         double x = coefficient * newValue;
-        std::cout << "+";
         factorLabel->setText(QString::number(x));
-        std::cout<<factorLabel->text().toStdString();
     };
-    m_changesMap.insert(measure2.m_type, func1);
-    m_usedDependance.insert(measure2.m_type);
-    
+    connect(copyButton, &QPushButton::clicked, this, [this, factorLabel] (){
+        copyBuffer->setText(factorLabel->text());
+    });
+    m_changesMap.insert(measure2.m_type, std::move(func1));
+    m_usedDependance.insert(measure2.m_type);    
 }
 
 void TechprocessViewer::addMaterial(QString name, double factor, const Measurement::Measure& measure1, const Measurement::Measure& measure2, MaterialEntry* alt)

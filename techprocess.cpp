@@ -3,11 +3,9 @@
 #include <iostream>
 
 //материал
-MaterialEntry::MaterialEntry(const QString name, double expense, const QString& measure)
-:m_name(name), m_measure1{Measurement::measureMap.at(measure)},m_measure2{Measurement::measureMap.at("шт")}, m_expense(expense)
-{
-    
-}
+MaterialEntry::MaterialEntry(const QString name, double expense, const Measurement::Measure &measure1, const Measurement::Measure &measure2, const Measurement::Measure &measure3)
+//:m_name(name), m_measure1{Measurement::measureMap.at(measure1)}
+{}
 
 MaterialEntry::MaterialEntry (const QString name, double expense, const Measurement::Measure &measure1, const Measurement::Measure &measure2)
 :m_name(name),m_measure1(measure1), m_measure2(measure2), m_expense(expense)

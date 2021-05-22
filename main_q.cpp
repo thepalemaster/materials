@@ -1,4 +1,3 @@
-#include <QtWidgets/QApplication>
 #include <QTextStream>////
 
 #include "parser.hpp"
@@ -11,10 +10,7 @@ int main (int argc, char *argv[])
 {
     QApplication app(argc, argv);
     Parser *mainparser = new Parser("data");
-    TechprocessViewer *tv = new TechprocessViewer();
-    Techprocess *tp = mainparser->parseResult();
     TechListViewer *mainlist = new TechListViewer(mainparser->getResult());
-    //tv->generateGui(tp);
     mainlist->show();
     
 //    delete mainparser;
