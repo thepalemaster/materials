@@ -1,0 +1,61 @@
+#include "material_entry.hpp"
+#include "techprocess_viewer.hpp"
+
+
+MaterialEntry::MaterialEntry(const QString name, double expense, const Measurement::Measure& measure1, QChar sigh1, const Measurement::Measure& measure2)
+:m_name{name}, m_measure1{measure1}
+{
+    m_element1 = new CalculateElement{expense, sigh1, measure2};
+}
+
+MaterialEntry::~MaterialEntry()
+{
+    delete m_element1;
+    if (m_element2)
+    {
+        delete m_element2;
+    }
+}
+
+MaterialEntry::MaterialEntry(const QString name, double expense, const Measurement::Measure& measure1, 
+                             QChar sigh1, const Measurement::Measure& measure2, QChar sigh2, 
+                             double additional_expense, const Measurement::Measure& measure3):
+                             MaterialEntry{name, expense, measure1, sigh1, measure2}
+{
+    m_element2 = new CalculateElement{additional_expense, sigh2, measure3};
+}
+
+
+void MaterialEntry::addAlternative(MaterialEntry *alternative)
+{
+    if (m_alt)
+    {
+        m_alt->addAlternative(alternative);
+    }
+    else
+    {
+       m_alt = alternative;
+    }
+}
+
+void MaterialEntry::printToConsole()
+{
+    std::cout << m_name.toStdString() << '\t'<< '\t'<< m_element1->expense << '\t' <<m_measure1.m_shortName.toStdString() << '/' << m_element1->m_measure.m_shortName.toStdString()<< '\n';
+    if (m_alt)
+    {
+        std::cout << "или" << '\n';
+        m_alt->printToConsole();
+    }
+}
+
+void MaterialEntry::transferInfo(TechprocessViewer* viewer)
+{
+    if(m_alt)
+    {
+        viewer->addMaterial(m_name, m_measure1, m_element1, m_alt);
+    }
+    else
+    {
+        viewer->addMaterial(m_name, m_measure1, m_element1);
+    }
+}
