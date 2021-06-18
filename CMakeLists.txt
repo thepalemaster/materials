@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 3.1)
 
 set(projectName materialsQt)
 
-#add_subdirectory(compile-time-regular-expressions/)
-
-project(${projectName} VERSION 0.2.0)
+project(${projectName} VERSION 0.3.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,16 +20,15 @@ endif()
 
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
-#set(CMAKE_PREFIX_PATH /home/palemaster/projects/cpp/re/)
-#find_package(ctre REQUIRED)
-
 add_executable(${projectName}
 main_q.cpp
 techprocess.cpp
+operation.cpp
 parser.cpp
 measurement.cpp
-gui_techprocess.cpp
+techprocess_viewer.cpp
 gui_techlist.cpp
+material_entry.cpp
 )
 
 #install(TARGETS ${projectName} RUNTIME DESTINATION bin)

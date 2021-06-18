@@ -1,6 +1,7 @@
 #pragma once
 #include "techprocess.hpp"
 #include <QFile>
+#include <QRegularExpression>
 
 class Parser 
 {
@@ -15,14 +16,13 @@ private:
     };
     PreviousLine previous = NONE;
     std::vector<Techprocess*> techlist;
-    
-    int counter = 0;
-    
     QStringList m_captured;
-    QRegExp m_materialLine;
-    QRegExp m_techprocessRegExp{"\\s*техпроцесс\\s+(.+)\\s*", Qt::CaseInsensitive};
+    QRegularExpressionMatch m_lastMatch;
+    QRegularExpression m_materialLine;
+    static const QRegularExpression m_techprocessRegExp;
+    int counter = 0;
     bool isOperation (const QString &operation);
-    bool isMaterialDef(const QString &material);
+    bool isMaterialDefinition(const QString &material);
     bool isTechprocess(const QString &techprocess);
     void scanDir(const QString &directory);
     void addNewTech(const QString &name);
@@ -39,3 +39,4 @@ public:
     std::vector<Techprocess*>* getResult ();
     void printToConsole();
 };
+

@@ -7,7 +7,6 @@ TechListViewer::TechListViewer(std::vector<Techprocess *> *ptr)
     m_techStack = new QStackedWidget;
     for (auto techItem: *ptr)
     {
-        techItem->printToConsole();
         TechprocessViewer *techviewer = new TechprocessViewer(techItem);
         m_techCombo->addItem(techItem->getName());
         m_techStack->addWidget(techviewer);

@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QComboBox>
-#include "gui_techprocess.hpp"
+#include "techprocess_viewer.hpp"
 
 class TechListViewer: public QWidget
 {

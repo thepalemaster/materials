@@ -1,5 +1,3 @@
-#include <QTextStream>////
-
 #include "parser.hpp"
 #include "gui_techlist.hpp"
 

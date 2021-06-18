@@ -7,25 +7,24 @@
 
 #include <iostream>
 
+const QRegularExpression Parser::m_techprocessRegExp{"^\\s*техпроцесс\\s+(.+)\\s*$", QRegularExpression::CaseInsensitiveOption};
 
 Parser::Parser(const QString& directory)
 {
-    //регулярное выражение чтобы вычленять данные по операциям
-    QString rx = 
-    "^\\s*(.+)\\s+(\\d+[,\\.]?\\d*)\\s{0,6}("
-    + Measurement::regExpMeasure + ")\\/("
-    + Measurement::regExpMeasure + ")\\s*$";
-    QString xx = "((\\s{0,4}d+[,\\.]?\\d*)\\s{0,4}("+ Measurement::regExpMeasure + "))?";
-    /*
-    "^ *(.+) +(\\d+[,\\.]?\\d*) {0,5}("
-    + Measurement::regExpMeasure + ")\\/("
-    + Measurement::regExpMeasure + ") *$";
-    */
-    //m_materialLine.setPatternSyntax(QRegExp::RegExp2);
+    const QString rx = 
+    "^\\s*(?<name>.+)\\s+(?<number>\\d+[,\\.]?\\d*)\\s{0,6}(?<measure1>"
+    + Measurement::regExpMeasure + 
+    ")\\s{0,3}\\/\\s{0,3}(?<measure2>"
+    + Measurement::regExpMeasure + 
+    ")\\s{0,4}(?<special1>\\(.{2,20}\\))?(\\s{0,4}[\\*\\/]\\s{0,4}(?<number1>\\d+[,\\.]?\\d*)?\\s{0,4}(?<measure3>"
+    + Measurement::regExpMeasure +
+    ")(?<special2>\\(.{2,20}\\))?)?\\s*$";
+    std::cout << rx.toStdString();
     m_materialLine.setPattern(rx);
-    m_materialLine.setCaseSensitivity(Qt::CaseInsensitive);
+    m_materialLine.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
     scanDir(directory);
 }
+
 
 Parser::~Parser()
 {
@@ -38,7 +37,6 @@ Parser::~Parser()
 
 void Parser::scanDir(const QString& directory)
 {
-
     QDir dir = QDir(directory);
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Files);
     if (!dir.exists())
@@ -76,25 +74,40 @@ void Parser::addNewOperation(const QString &operation)
 
 MaterialEntry * Parser::getMaterial()
 {
-    double num;
-    if (m_captured.at(1).contains(","))
+    double expenseNumber1 = m_lastMatch.captured("number").toDouble();
+    if (m_lastMatch.captured("measure3").isEmpty())
     {
-        QString temp = m_captured.at(1);
-        temp.replace(QString(","), QString("."));
-        num = temp.toDouble();
+        return new MaterialEntry(
+            m_lastMatch.captured("name"),
+            expenseNumber1,
+            Measurement::measureMap.at(m_lastMatch.captured("measure1")),
+            m_lastMatch.captured("special1"),
+            Measurement::measureMap.at(m_lastMatch.captured("measure2"))
+        );
     }
     else
     {
-        num = m_captured.at(1).toDouble();
+        double expenseNumber2;
+        if(m_lastMatch.captured("measure3").isEmpty())
+        {
+            expenseNumber2 = 1;
+        }
+        else
+        {
+            expenseNumber2 = m_lastMatch.captured("number1").toDouble();
+        }
+        return new MaterialEntry(
+            m_lastMatch.captured("name"),
+            expenseNumber1,
+            Measurement::measureMap.at(m_lastMatch.captured("measure1")),
+            m_lastMatch.captured("special1"),
+            Measurement::measureMap.at(m_lastMatch.captured("measure2")),
+            m_lastMatch.captured("special2"),
+            expenseNumber2,
+            Measurement::measureMap.at(m_lastMatch.captured("measure3"))
+        );
     }
-    MaterialEntry *entry = new MaterialEntry(
-            m_captured.at(0), 
-            num,
-            Measurement::measureMap.at(m_captured.at(2)),
-            Measurement::measureMap.at(m_captured.at(3)));
-    return entry;
 }
-
 
 void Parser::addNewMatetial()
 {
@@ -104,13 +117,11 @@ void Parser::addNewMatetial()
 
 bool Parser::isTechprocess(const QString& techprocess)
 {
-    if(m_techprocessRegExp.indexIn(techprocess) < 0)
-    {
+    m_lastMatch = m_techprocessRegExp.match(techprocess);
+    if(m_lastMatch.hasMatch())
+        return true;
+    else
         return false;
-    }
-    m_captured.clear();
-    m_captured <<  m_techprocessRegExp.cap(1);
-    return true;
 }
 
 
@@ -125,15 +136,17 @@ bool Parser::isOperation (const QString &operation)
             return false;
 }
 
-bool Parser::isMaterialDef(const QString &material)
+bool Parser::isMaterialDefinition(const QString &material)
 {
-    if(m_materialLine.indexIn(material) < 0)
+    m_lastMatch = m_materialLine.match(material);
+    if(m_lastMatch.hasMatch())
+    {
+        return true;
+    }
+    else
     {
         return false;
     }
-    m_captured.clear();
-    m_captured << m_materialLine.cap(1) << m_materialLine.cap(2) << m_materialLine.cap(3) << m_materialLine.cap(4);
-    return true;
 }
                 
 void Parser::parseLine(const QString &line)
@@ -141,7 +154,7 @@ void Parser::parseLine(const QString &line)
     //для инициализации техпроцесса необходимо ключевое слово "техпроцесс"
     if (isTechprocess(line))
     {
-        addNewTech(m_captured[0]);
+        addNewTech(m_lastMatch.captured(1));
         previous = TECHPROCESS;
     }
     //если техпроцесс не инициализирован, то все строки ситаются просто комментариями
@@ -161,7 +174,7 @@ void Parser::parseLine(const QString &line)
     //провеключевого слова ИЛИ
     else if (previous == OR_MATERIAL)
     {
-        if(isMaterialDef(line))
+        if(isMaterialDefinition(line))
         {
             std::cout<<"OR";
             techlist.back()->addAlternative(getMaterial());
@@ -179,7 +192,7 @@ void Parser::parseLine(const QString &line)
         //на следующем шаге  которая запоминается как допустимая замена приведущей
     }
     //проверка является ли стока определением материала
-    else if (isMaterialDef(line))
+    else if (isMaterialDefinition(line))
     {
         addNewMatetial();
         previous = MATERIAL;

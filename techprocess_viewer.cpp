@@ -1,14 +1,6 @@
-#include "gui_techprocess.hpp"
-
+#include "techprocess_viewer.hpp"
 
 #include <iostream>
-
-
-TechprocessViewer::TechprocessViewer(QWidget *parent)
-    :QWidget(parent)
-{
-    std::cout<<"Гуй9\n";    
-}
 
 TechprocessViewer::TechprocessViewer(Techprocess* tech, QWidget *parent)
     :QWidget(parent)
@@ -17,9 +9,9 @@ TechprocessViewer::TechprocessViewer(Techprocess* tech, QWidget *parent)
     generateGui(tech);  
 }
 
-void TechprocessViewer::updateMaterials(double newValue, Measurement::Type measureType)
+void TechprocessViewer::updateMaterials(double newValue, const QString measureType)
 {
-    QMultiMap<Measurement::Type, std::function<void(double)>>::iterator it = m_changesMap.find(measureType);
+    QMultiMap<QString, std::function<void(double)>>::iterator it = m_changesMap.find(measureType);
     for (; it != m_changesMap.end() && it.key() == measureType; ++it)
     {
          (*it)(newValue);
@@ -39,7 +31,7 @@ void TechprocessViewer::generateGui(Techprocess* tech)
     for (auto it = m_usedDependance.begin(); it != m_usedDependance.end(); ++it)
     {
         lineEdit = new QLineEdit();
-        measure = new QLabel(Measurement::inputLabel.at(*it));
+        measure = new QLabel(*it);
         connect(lineEdit, &QLineEdit::editingFinished, this, [=](){
             QString inputText = lineEdit->text();
             bool condition;
@@ -70,41 +62,81 @@ void TechprocessViewer::generateGui(Techprocess* tech)
     m_gridBox->addWidget(opername, m_currentRow, 0, 1, 2);
 }
 
-void TechprocessViewer::addMaterial(QString name, double factor, const Measurement::Measure& measure1, const Measurement::Measure& measure2)
+void TechprocessViewer::addMaterial(QString name, const Measurement::Measure& measure, CalculateElement* element)
 {
-    ++m_currentRow;
     QLabel *matName = new QLabel(name);
-    QLabel *measureName1 = new QLabel(measure1.m_shortName);
-    QLabel *factorLabel = new QLabel("0");
+    QLabel *measureName = new QLabel(measure.m_shortName);
+    QLabel *factorLabel= new QLabel("0");;
     QPushButton *copyButton = new QPushButton("Скопировать");
-    m_gridBox->addWidget(matName, m_currentRow, 0);
-    m_gridBox->addWidget(factorLabel, m_currentRow, 1);
-    m_gridBox->addWidget(measureName1, m_currentRow, 2);
-    m_gridBox->addWidget(copyButton, m_currentRow, 3);
-    if (measure2.m_type == Measurement::UNITS)
-    {
-        factorLabel->setText(QString::number(factor));
-        return;
-    }
-    double coefficient = factor * measure1.m_coefficient / measure2.m_coefficient; 
-    std::function <void(double)> func1= [coefficient, factorLabel](double newValue)
-    { 
-        double x = coefficient * newValue;
-        factorLabel->setText(QString::number(x));
-    };
+    writeRow(matName, factorLabel, measureName, copyButton);
     connect(copyButton, &QPushButton::clicked, this, [this, factorLabel] (){
         copyBuffer->setText(factorLabel->text());
     });
-    m_changesMap.insert(measure2.m_type, std::move(func1));
-    m_usedDependance.insert(measure2.m_type);    
+    if(element->m_measure.m_type == Measurement::UNITS)
+    {
+        factorLabel->setText(QString::number(element->expense));
+        return;
+    }
+    double coefficient = element->expense * (measure.m_coefficient / element->m_measure.m_coefficient);
+    std::function <void(double)> func1= [coefficient, factorLabel](double newValue)
+    { 
+        factorLabel->setText(QString::number(coefficient * newValue));
+    };
+    QString dependanceKey = QString("%1 %2:").arg(Measurement::inputLabel.at(element->m_measure.m_type)).arg(element->name);
+    m_changesMap.insert(dependanceKey, std::move(func1));
+    m_usedDependance.insert(dependanceKey);    
 }
 
-void TechprocessViewer::addMaterial(QString name, double factor, const Measurement::Measure& measure1, const Measurement::Measure& measure2, MaterialEntry* alt)
-{
 
-    addMaterial(name, factor, measure1, measure2);
-    QLabel *orLabel = new QLabel(QString("или"));
-    ++m_currentRow;
-    m_gridBox->addWidget(orLabel, m_currentRow, 0);
+void TechprocessViewer::addMaterial(QString name, const Measurement::Measure& measure, CalculateElement* element, MaterialEntry* alt)
+{
+    addMaterial(name, measure, element);
+    writeRow(new QLabel("или"));
     alt->transferInfo(this);
+}
+
+
+
+void TechprocessViewer::addMaterial(QString name, const Measurement::Measure& measure, CalculateElement* element1, CalculateElement* element2)
+{
+    QLabel *matName = new QLabel(name);
+    QLabel *measureName = new QLabel(measure.m_shortName);
+    QLabel *factorLabel  = new QLabel("0");
+    QPushButton *copyButton = new QPushButton("Скопировать");
+    double coefficient1 = element1->expense * (measure.m_coefficient / element1->m_measure.m_coefficient);
+    double coefficient2 = element2->expense * element2->m_measure.m_coefficient;
+    auto mainFunc = 
+        [factorLabel, input1{0.}, input2{0.}, coefficient1, coefficient2,
+        type1{element1->m_measure.m_type}, type2{element1->m_measure.m_type}]
+        (double number, Measurement::Type type) mutable
+        {
+            if(type == type1)
+            {
+                input1 = number;
+            }
+            else if(type == type2)
+            {
+                input2 = number;
+            }
+            double result = (coefficient1 * input1) * (coefficient2 / input2);
+            factorLabel->setText(QString::number(result));
+        };
+    writeRow(matName, factorLabel, measureName, copyButton);
+};
+
+
+
+void TechprocessViewer::writeRow(QLabel* element1, QLabel* element2, QLabel* element3, QWidget* element4)
+{
+    ++m_currentRow;
+    m_gridBox->addWidget(element1, m_currentRow, 0);
+    m_gridBox->addWidget(element2, m_currentRow, 1);
+    m_gridBox->addWidget(element3, m_currentRow, 2);
+    m_gridBox->addWidget(element4, m_currentRow, 3);
+}
+
+void TechprocessViewer::writeRow(QLabel* element)
+{
+    ++m_currentRow;
+    m_gridBox->addWidget(element, m_currentRow, 0);
 }

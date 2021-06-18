@@ -2,10 +2,10 @@
 #include "techprocess_viewer.hpp"
 
 
-MaterialEntry::MaterialEntry(const QString name, double expense, const Measurement::Measure& measure1, QChar sigh1, const Measurement::Measure& measure2)
+MaterialEntry::MaterialEntry(const QString name, double expense, const Measurement::Measure& measure1, QString measureName, const Measurement::Measure& measure2)
 :m_name{name}, m_measure1{measure1}
 {
-    m_element1 = new CalculateElement{expense, sigh1, measure2};
+    m_element1 = new CalculateElement{expense, measureName, measure2};
 }
 
 MaterialEntry::~MaterialEntry()
@@ -18,11 +18,11 @@ MaterialEntry::~MaterialEntry()
 }
 
 MaterialEntry::MaterialEntry(const QString name, double expense, const Measurement::Measure& measure1, 
-                             QChar sigh1, const Measurement::Measure& measure2, QChar sigh2, 
+                             QString measureName1, const Measurement::Measure& measure2, QString measureName2, 
                              double additional_expense, const Measurement::Measure& measure3):
-                             MaterialEntry{name, expense, measure1, sigh1, measure2}
+                             MaterialEntry{name, expense, measure1, measureName1, measure2}
 {
-    m_element2 = new CalculateElement{additional_expense, sigh2, measure3};
+    m_element2 = new CalculateElement{additional_expense, measureName2, measure3};
 }
 
 

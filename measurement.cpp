@@ -1,6 +1,9 @@
 #include "measurement.hpp"
 
-QString Measurement::getRegExpMeasure(const std::map<QString, Measure> &map)
+using namespace Measurement;
+
+
+QString  Measurement::getRegExpMeasure(const std::map<QString, Measure>& map)
 {
     QStringList stringList;
     for(auto &it: map)
@@ -9,3 +12,6 @@ QString Measurement::getRegExpMeasure(const std::map<QString, Measure> &map)
     }
     return stringList.join("|");
 }
+
+//Measurement::regExpMeasure = getRegExpMeasure (measureMap);
+

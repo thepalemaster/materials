@@ -2,21 +2,13 @@
 
 #include <QtWidgets/QApplication>
 #include <QClipboard>
-
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPushButton>
-#include <set>
+#include <QSet>
 
 #include "techprocess.hpp"
-
-
-struct DependanceSignal
-{
-    Measurement::Type type;
-    double value;
-};
 
 
 class TechprocessViewer: public QWidget
@@ -26,19 +18,21 @@ private:
     QClipboard *copyBuffer;
     QGridLayout *m_gridBox;
     QVBoxLayout *m_dependanceBox;
-    QMultiMap<Measurement::Type, std::function<void(double)>> m_changesMap;
-    std::set<Measurement::Type> m_usedDependance;
-    //задел на будущее для параметром которые зависят более чем от одного параметра
+    QMultiMap<QString, std::function<void(double)>> m_changesMap;
+    QSet<QString> m_usedDependance;
     std::vector<std::function<void(double, Measurement::Type)>> m_complexDependance;
     int m_currentRow = 0;
-    void updateMaterials(double newValue, Measurement::Type measureType);
+    void updateMaterials(double newValue, const QString measureType);
+    void writeRow(QLabel *element1, QLabel *element2, QLabel *element3, QWidget *element4);
+    void writeRow(QLabel *element);
     
 public:
-    explicit TechprocessViewer(QWidget *parent = nullptr);
     explicit TechprocessViewer(Techprocess* tech, QWidget *parent = nullptr);
     void generateGui(Techprocess *tech);
     void addNameTech(QString name);
     void addOperation(QString name);
-    void addMaterial(QString name, double factor, const Measurement::Measure &measure1, const Measurement::Measure &measure2);
-    void addMaterial(QString name, double factor, const Measurement::Measure &measure1, const Measurement::Measure &measure2, MaterialEntry *alt);
+    void addMaterial(QString name, const Measurement::Measure &measure, CalculateElement *element1, CalculateElement *element2);
+    void addMaterial(QString name, const Measurement::Measure &measure, CalculateElement *element1, CalculateElement *element2, MaterialEntry *alt);
+    void addMaterial(QString name, const Measurement::Measure &measure, CalculateElement *element, MaterialEntry *alt);
+    void addMaterial(QString name, const Measurement::Measure &measure, CalculateElement *element);
 };

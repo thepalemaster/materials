@@ -1,97 +1,6 @@
-#include "gui_techprocess.hpp"
+#include "techprocess.hpp"
+#include "techprocess_viewer.hpp"
 
-#include <iostream>
-
-//материал
-MaterialEntry::MaterialEntry(const QString name, double expense, const Measurement::Measure &measure1, const Measurement::Measure &measure2, const Measurement::Measure &measure3)
-//:m_name(name), m_measure1{Measurement::measureMap.at(measure1)}
-{}
-
-MaterialEntry::MaterialEntry (const QString name, double expense, const Measurement::Measure &measure1, const Measurement::Measure &measure2)
-:m_name(name),m_measure1(measure1), m_measure2(measure2), m_expense(expense)
-{}
-
-void MaterialEntry::addAlternative(MaterialEntry *alternative)
-{
-    if (m_alt)
-    {
-        m_alt->addAlternative(alternative);
-    }
-    else
-    {
-       m_alt = alternative;
-    }
-}
-
-void MaterialEntry::printToConsole()
-{
-    std::cout << m_name.toStdString() << '\t'<< '\t'<< m_expense << '\t' <<m_measure1.m_shortName.toStdString() << '/' << m_measure2.m_shortName.toStdString()<< '\n';
-    if (m_alt)
-    {
-        std::cout << "или" << '\n';
-        m_alt->printToConsole();
-    }
-}
-
-void MaterialEntry::transferInfo(TechprocessViewer *viewer)
-{
-    if(m_alt)
-    {
-        viewer->addMaterial(m_name, m_expense, m_measure1, m_measure2, m_alt);
-    }
-    else
-    {
-        viewer->addMaterial(m_name, m_expense,  m_measure1, m_measure2);
-    }
-}
-
-
-
-//операция
-Operation::Operation(const QString& name):m_name(name) {}
-
-Operation::~Operation()
-{
-    std::vector<MaterialEntry*>::iterator i;
-    for (i = materials.begin(); i != materials.end(); ++i)
-    {
-        delete *i;
-    }
-}
-
-void Operation::printToConsole()
-{
-    std::cout<< m_name.toStdString() << '\n';
-    std::vector<MaterialEntry*>::const_iterator i;
-    for (i = materials.begin(); i != materials.end(); ++i)
-    {
-        (*i)->printToConsole();
-    }
-}
-
-void Operation::transferInfo(TechprocessViewer *viewer)
-{
-    viewer->addOperation(m_name);
-    std::vector<MaterialEntry*>::const_iterator i;
-    for (i = materials.begin(); i != materials.end(); ++i)
-    {
-        (*i)->transferInfo(viewer);
-    } 
-}
-    
-void Operation::addMaterial(MaterialEntry *material)
-{
-    materials.push_back(material);
-}
-
-void Operation::addAlternative(MaterialEntry *alternative)
-{
-    materials.back()->addAlternative(alternative);
-}
- 
- 
- 
-//техпроцесс
 Techprocess::Techprocess (QString name)
     {
         m_name = name;
@@ -128,7 +37,7 @@ void Techprocess::printToConsole()
     
 }
 
-void Techprocess::transferInfo(TechprocessViewer* viewer)
+void Techprocess::transferInfo (TechprocessViewer *viewer)
 {
     viewer->addNameTech(m_name);
     std::vector<Operation*>::const_iterator i;

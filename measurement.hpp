@@ -1,13 +1,10 @@
 #pragma once
 #include <QString>
 #include <QStringList>
-
-#include <QMap>
 #include <map>
 
 namespace Measurement
 {
-    
     enum Type
     {
         MASS,
@@ -21,28 +18,28 @@ namespace Measurement
     
     const std::map<Measurement::Type, QString> inputLabel
     {
-        {MASS, "Масса в г:"},
-        {LENGTH, "Длинна в м:"},
-        {AREA, "Площадь в дм<sup>2</sup>:"},
-        {VOLUME,"Объём в литрах(дм<sup>3</sup>):"},
-        {UNITS, "Колличество в шт.:"},
-        {THICKNESS, "Толщина в мкм:"}
+        {MASS, "Масса в г"},
+        {LENGTH, "Длинна в м"},
+        {AREA, "Площадь в дм<sup>2</sup>"},
+        {VOLUME,"Объём в литрах(дм<sup>3</sup>)"},
+        {UNITS, "Колличество в шт."},
+        {THICKNESS, "Толщина в мкм"}
     };
     
     class Measure
     {
     public:
         QString m_shortName;
+        QString m_name;
         Type m_type;
         double m_coefficient;
+        
         Measure(QString shortName, QString name, Type type, double coef):
         m_shortName(shortName),
-        m_type(type),
         m_name(name),
+        m_type(type),
         m_coefficient(coef)
         {}
-    private:
-        QString m_name;
     };
     
     const std::map<QString, Measure> measureMap = {
@@ -67,6 +64,6 @@ namespace Measurement
     
     QString getRegExpMeasure(const std::map<QString, Measure> &map);
     
-    const QString regExpMeasure  = getRegExpMeasure (measureMap);
+    const QString regExpMeasure { getRegExpMeasure (measureMap) };
     
 }
