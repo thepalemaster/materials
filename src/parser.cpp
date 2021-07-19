@@ -10,8 +10,14 @@ const QRegularExpression Parser::m_techprocessRegExp{"^\\s*техпроцесс\
 
 Parser::Parser(const QString& directory)
 {
+    Parser();
+    scanDir(directory);
+}
+
+Parser::Parser()
+{
     const QString rx = 
-    "^\\s*(?<name>.+)\\s+(?<number>\\d+[,\\.]?\\d*)\\s{0,6}(?<measure1>"
+    "^\\s*(?<name>.+?)\\s+(?<number>\\d+[,\\.]?\\d*)\\s{0,6}(?<measure1>"
     + Measurement::regExpMeasure + 
     ")\\s{0,3}\\/\\s{0,3}(?<measure2>"
     + Measurement::regExpMeasure + 
@@ -20,8 +26,8 @@ Parser::Parser(const QString& directory)
     ")s{0,3}(?<special2>\\(.{2,25}\\))?)?\\s*$";
     m_materialLine.setPattern(rx);
     m_materialLine.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-    scanDir(directory);
 }
+
 
 void Parser::scanDir(const QString& directory)
 {
@@ -45,12 +51,15 @@ void Parser::scanDir(const QString& directory)
         {
             parseLine(in.readLine());
         }
+        previous = NONE;
+        initTechprocess = false;
     }
 }
 
 void Parser::addNewTech(const QString &name)
 {
     techlist.emplace_back(Techprocess(name));
+    initTechprocess = true;
 }
 
 
@@ -155,7 +164,7 @@ void Parser::parseLine(const QString &line)
         previous = TECHPROCESS;
     }
     //если техпроцесс не инициализирован, то все строки ситаются просто комментариями
-    else if (techlist.empty())
+    else if (!initTechprocess)
     {
         previous = NONE;
     }

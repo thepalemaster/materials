@@ -45,4 +45,18 @@ void Operation::addAlternative(MaterialEntry *alternative)
 {
     materials.back()->addAlternative(alternative);
 }
+
+QString Operation::getName()
+{
+    return m_name;
+}
+
+std::vector<QString> Operation::getMaterial(int index)
+{
+    if (index>= materials.size() || index < 0)
+    {
+        return {};
+    }
+    return materials[index]->getLabels();
+}
  

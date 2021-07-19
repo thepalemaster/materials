@@ -102,16 +102,17 @@ void TechprocessViewer::addMaterial(const QString &name, const Measurement::Meas
         return;
     }
     QLabel *factorLabel = writeMaterialRow(name, measure);
+    auto index = m_complexDependance.size();
     m_complexDependance.emplace_back(
         ComplexDependance(factorLabel, measure, element1, element2)
     );
     addLambda(element1,
-              [this, index{m_complexDependance.size() - 1}, type1{element1->m_measure.m_type}] (double input)
+              [this, index, type1{element1->m_measure.m_type}] (double input)
               {
                   m_complexDependance[index](input, type1);
               });
     addLambda(element2,
-              [this, index{m_complexDependance.size() - 1}, type2{element2->m_measure.m_type}] (double input)
+              [this, index, type2{element2->m_measure.m_type}] (double input)
               {
                   m_complexDependance[index](input, type2);
               });

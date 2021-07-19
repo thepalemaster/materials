@@ -1,8 +1,6 @@
 #pragma once
-//#include "techprocess_viewer.hpp"
 #include <QString>
 #include "measurement.hpp"
-
 
 class TechprocessViewer;
 
@@ -30,7 +28,7 @@ public:
     ~MaterialEntry();
     void addAlternative(MaterialEntry *alt);
     void calculate (double input, Measurement::Measure inputMeasure);
-    QString* getLabels();
+    std::vector<QString> getLabels();
     void printToConsole();
     void transferInfo (TechprocessViewer *viewer) const;
 };

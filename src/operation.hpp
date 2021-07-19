@@ -14,4 +14,6 @@ public:
     void addMaterial(MaterialEntry *material);
     void printToConsole();
     void transferInfo (TechprocessViewer *viewer) const;
+    QString getName();
+    std::vector<QString> getMaterial(int index);
 };

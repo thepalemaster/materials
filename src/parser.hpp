@@ -12,13 +12,14 @@ private:
         OR_MATERIAL,
         MATERIAL,
         OPERATION,
-        TECHPROCESS,
+        TECHPROCESS
     };
     PreviousLine previous = NONE;
     std::vector<Techprocess> techlist;
     static const QRegularExpression m_techprocessRegExp;
     QRegularExpressionMatch m_lastMatch;
     QRegularExpression m_materialLine;
+    bool initTechprocess = false;
     bool isOperation (const QString &operation);
     bool isMaterialDefinition(const QString &material);
     bool isTechprocess(const QString &techprocess);
@@ -32,6 +33,7 @@ private:
     
 public:
     Parser(const QString &directory);
+    Parser();
     void parseLine(const QString &line);
     std::vector<Techprocess> getResult ();
     void printToConsole();

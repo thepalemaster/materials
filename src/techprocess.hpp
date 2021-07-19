@@ -19,7 +19,8 @@ public:
     void addOperation(const QString &name);
     void addMaterial(MaterialEntry *material);
     void addAlternative(MaterialEntry *alt);
-    void printToConsole();
     void transferInfo (TechprocessViewer *viewer);
+    void printToConsole();
     QString getName();
+    std::vector<Operation*> getOperations();
 };

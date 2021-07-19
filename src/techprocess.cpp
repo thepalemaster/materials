@@ -65,3 +65,9 @@ QString Techprocess::getName()
 {
     return m_name;
 }
+
+std::vector<Operation *> Techprocess::getOperations()
+{
+    return m_operations;
+}
+

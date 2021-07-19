@@ -71,3 +71,28 @@ void MaterialEntry::transferInfo(TechprocessViewer* viewer) const
             viewer->addMaterial(m_name, m_measure1, m_element1);
     }
 }
+
+std::vector<QString> MaterialEntry::getLabels()
+{
+    std::vector<QString> listOfElements{m_name, m_measure1.m_name, m_element1->m_measure.m_name, QString::number(m_element1->expense)};
+    if (!m_element1->name.isEmpty())
+    {
+        listOfElements.push_back(m_element1->name);
+    }
+
+    if(m_element2)
+    {
+        listOfElements.push_back(m_element2->m_measure.m_name);
+        listOfElements.push_back(QString::number(m_element2->expense));
+        if (!m_element2->name.isEmpty())
+        {
+            listOfElements.push_back(m_element2->name);
+        }
+    }
+    if(m_alt)
+    {
+        std::vector<QString> altList = m_alt->getLabels();
+        listOfElements.insert(listOfElements.end(), altList.begin(), altList.end());
+    }
+    return listOfElements;
+}

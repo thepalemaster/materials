@@ -55,8 +55,8 @@ namespace Measurement
         {"см2", Measure{"см<sup>2</sup>", "сантиметр квадратный", AREA, 0.01}},
         {"дм2", Measure{"дм<sup>2</sup>", "дециметр квадратный", AREA, 1}},
         {"мг", Measure{"мг", "миллиграм", MASS, 0.001}},
-        {"г", Measure{"г", "грам", MASS, 1}},
-        {"кг", Measure{"кг", "килограм", MASS, 1000}},
+        {"г", Measure{"г", "грамм", MASS, 1}},
+        {"кг", Measure{"кг", "килограмм", MASS, 1000}},
         {"т", Measure{"т", "тонна", MASS, 1000000}},
         {"шт", Measure{"шт", "штук", UNITS, 1}},
         {"мкм", Measure{"мкм", "микрон", THICKNESS, 1}}

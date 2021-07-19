@@ -11,6 +11,7 @@ int main (int argc, char *argv[])
     TechListViewer mainlist(mainparser->getResult());
     mainlist.show();
     
+    
     delete mainparser;
     return app.exec();
     
