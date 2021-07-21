@@ -2,15 +2,16 @@
 #include <QTextStream>
 #include <QDir>
 
+#include <QMessageBox>
+
 #include "techprocess.hpp"
 #include "parser.hpp"
 
 
 const QRegularExpression Parser::m_techprocessRegExp{"^\\s*техпроцесс\\s+(.+)\\s*$", QRegularExpression::CaseInsensitiveOption};
 
-Parser::Parser(const QString& directory)
+Parser::Parser(const QString& directory):Parser()
 {
-    Parser();
     scanDir(directory);
 }
 
@@ -23,7 +24,7 @@ Parser::Parser()
     + Measurement::regExpMeasure + 
     ")\\s{0,4}(?<special1>\\(.{2,20}\\))?(\\s{0,4}[\\*\\/]\\s{0,4}(?<number1>\\d+[,\\.]?\\d*)?\\s{0,4}(?<measure3>"
     + Measurement::regExpMeasure +
-    ")s{0,3}(?<special2>\\(.{2,25}\\))?)?\\s*$";
+    ")\\s{0,3}(?<special2>\\(.{2,30}\\))?)?\\s*$";
     m_materialLine.setPattern(rx);
     m_materialLine.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 }
@@ -35,6 +36,7 @@ void Parser::scanDir(const QString& directory)
     dir.setFilter(QDir::NoDotAndDotDot | QDir::Files);
     if (!dir.exists())
     {
+        setDemoMode();
         return;
     }
     QFileInfoList list = dir.entryInfoList();
@@ -52,14 +54,18 @@ void Parser::scanDir(const QString& directory)
             parseLine(in.readLine());
         }
         previous = NONE;
-        initTechprocess = false;
+        m_initTechprocess = false;
+    }
+    if (techlist.size() == 0)
+    {
+        setDemoMode();
     }
 }
 
-void Parser::addNewTech(const QString &name)
+void Parser::addNewTech()
 {
-    techlist.emplace_back(Techprocess(name));
-    initTechprocess = true;
+    techlist.emplace_back(Techprocess(m_lastMatch.captured(1)));
+    m_initTechprocess = true;
 }
 
 
@@ -160,11 +166,11 @@ void Parser::parseLine(const QString &line)
     //для инициализации техпроцесса необходимо ключевое слово "техпроцесс"
     if (isTechprocess(line))
     {
-        addNewTech(m_lastMatch.captured(1));
+        addNewTech();
         previous = TECHPROCESS;
     }
     //если техпроцесс не инициализирован, то все строки ситаются просто комментариями
-    else if (!initTechprocess)
+    else if (!m_initTechprocess)
     {
         previous = NONE;
     }
@@ -182,7 +188,7 @@ void Parser::parseLine(const QString &line)
     {
         if(isMaterialDefinition(line))
         {
-            techlist.back().addAlternative(getMaterial());
+            addNewMatetial();
             previous = MATERIAL;
         }
         else
@@ -213,11 +219,39 @@ std::vector<Techprocess> Parser::getResult ()
     return std::move(techlist);
 }
 
-void Parser::printToConsole()
+void Parser::setDemoMode()
 {
-    for (auto &i:techlist )
+    std::vector<QString> demoText {
+        "Техпроцесс Окрашивание (демострация)",
+        "005 Обезжиривание",
+        "Уайт-спирит ГОСТ 3134-78  0,6мл/дм2",
+        "Бязь ГОСТ 29298-2005  0,5 дм2/дм2",
+        "010 Грунтование",
+        "Грунтовка АК-070 ГОСТ 25718-83   0,2г/дм2",
+        "015 Окраска",
+        "Эмаль ЭП-51 ГОСТ 9640-85    0,3г/дм2",
+        "Техпроцесс Оловинирование (демострация)",
+        "005 Травление",
+        "Кислота серная ГОСТ 4204-77 0,3 г/дм2",
+        "Уротропин  ГОСТ 1381-73 0,02 г/дм2",
+        "010 Никелирование",
+        "Никель сернокислый  ГОСТ 4465-2016   0,42 г/дм2 * мкм (толщина никелевого подслоя)",
+        "Натрий хлористый   ГОСТ 4233-77    0,2 г/дм2 * мкм (толщина никелевого подслоя)",
+        "Борная кислота   ГОСТ 9656-75  0,05 г/дм2 * мкм (толщина никелевого подслоя)",
+        "Аноды никелевые МД НПА1  ГОСТ 2132-2015   0,72 г/дм2 * мкм (толщина никелевого подслоя)",
+        "015 Оловинирование",
+        "Олово хлористое ГОСТ 36-78 0,6 г/дм2 * мкм (толщина оловяного покрытия)",
+        "Кислота соляная ГОСТ 857-95 0,02 г/дм2 * мкм (толщина оловяного покрытия)",
+        "Аноды оловянные ГОСТ 860-75 0,9г/дм2 * мкм (толщина оловяного покрытия)"
+    };
+    for(auto &line: demoText)
     {
-        i.printToConsole();
+        parseLine(line);
     }
+    QString message ("Технологических данных не обнаружено, программа запущена демонстрационном режиме.");
+    QMessageBox demoMsgBox;
+    demoMsgBox.setText(message);
+    demoMsgBox.exec(); 
     
 }
+

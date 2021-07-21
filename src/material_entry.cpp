@@ -44,16 +44,6 @@ void MaterialEntry::addAlternative(MaterialEntry *alternative)
     }
 }
 
-void MaterialEntry::printToConsole()
-{
-    std::cout << m_name.toStdString() << '\t'<< '\t'<< m_element1->expense << '\t' <<m_measure1.m_shortName.toStdString() << '/' << m_element1->m_measure.m_shortName.toStdString()<< '\n';
-    if (m_alt)
-    {
-        std::cout << "или" << '\n';
-        m_alt->printToConsole();
-    }
-}
-
 void MaterialEntry::transferInfo(TechprocessViewer* viewer) const
 {
     if (m_alt)

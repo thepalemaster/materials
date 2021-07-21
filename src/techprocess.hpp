@@ -20,7 +20,6 @@ public:
     void addMaterial(MaterialEntry *material);
     void addAlternative(MaterialEntry *alt);
     void transferInfo (TechprocessViewer *viewer);
-    void printToConsole();
     QString getName();
     std::vector<Operation*> getOperations();
 };

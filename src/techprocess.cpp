@@ -40,16 +40,6 @@ void Techprocess::addAlternative(MaterialEntry *alternative)
     m_operations.back()->addAlternative(alternative);
 }
 
-void Techprocess::printToConsole()
-{
-    std::cout << "Техпроцесс " << m_name.toStdString()<<'\n';
-    std::vector<Operation*>::const_iterator i;
-    for (i = m_operations.begin(); i != m_operations.end(); ++i)
-    {
-        (*i)->printToConsole();
-    }
-    
-}
 
 void Techprocess::transferInfo (TechprocessViewer *viewer)
 {

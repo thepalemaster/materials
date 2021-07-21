@@ -29,6 +29,5 @@ public:
     void addAlternative(MaterialEntry *alt);
     void calculate (double input, Measurement::Measure inputMeasure);
     std::vector<QString> getLabels();
-    void printToConsole();
     void transferInfo (TechprocessViewer *viewer) const;
 };

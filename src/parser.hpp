@@ -19,23 +19,22 @@ private:
     static const QRegularExpression m_techprocessRegExp;
     QRegularExpressionMatch m_lastMatch;
     QRegularExpression m_materialLine;
-    bool initTechprocess = false;
+    bool m_initTechprocess = false;
     bool isOperation (const QString &operation);
     bool isMaterialDefinition(const QString &material);
     bool isTechprocess(const QString &techprocess);
     void scanDir(const QString &directory);
-    void addNewTech(const QString &name);
+    void addNewTech();
     void addNewOperation(const QString &operation);
-    void addNewMatetial(const QString &material);
     void addNewMatetial();
     double getNumber(QString number);
     MaterialEntry* getMaterial();
+    void setDemoMode();
     
 public:
     Parser(const QString &directory);
     Parser();
     void parseLine(const QString &line);
     std::vector<Techprocess> getResult ();
-    void printToConsole();
 };
 
