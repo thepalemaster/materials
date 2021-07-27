@@ -8,6 +8,7 @@
 #include <QtWidgets/QPushButton>
 #include <QSet>
 
+#include "inputnumberqvalidator.hpp"
 #include "techprocess.hpp"
 
 
@@ -18,6 +19,7 @@ private:
     QClipboard *copyBuffer;
     QGridLayout *m_gridBox;
     QVBoxLayout *m_dependanceBox;
+    QValidator *inputValidator;
     QMultiMap<QString, std::function<void(double)>> m_changesMap;
     QSet<QString> m_usedDependance;
     std::vector<std::function<void(double, Measurement::Type)>> m_complexDependance;

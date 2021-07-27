@@ -16,16 +16,6 @@ Operation::~Operation()
     }
 }
 
-void Operation::printToConsole()
-{
-    std::cout<< m_name.toStdString() << '\n';
-    std::vector<MaterialEntry*>::const_iterator i;
-    for (i = materials.begin(); i != materials.end(); ++i)
-    {
-        (*i)->printToConsole();
-    }
-}
-
 void Operation::transferInfo(TechprocessViewer *viewer) const
 {
     viewer->addOperation(m_name);

@@ -35,6 +35,7 @@ add_executable(${projectName}
     ${SRC_DIR}/techprocess_viewer.cpp
     ${SRC_DIR}/gui_techlist.cpp
     ${SRC_DIR}/material_entry.cpp
+    ${SRC_DIR}/inputnumberqvalidator.cpp
 )
 
 target_include_directories(${projectName} PUBLIC  ${Qt5_INCLUDE_DIR})

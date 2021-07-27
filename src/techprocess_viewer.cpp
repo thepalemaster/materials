@@ -1,11 +1,13 @@
 #include "techprocess_viewer.hpp"
 #include "complex_dependance.hpp"
+#include "inputnumberqvalidator.hpp"
 
 
 TechprocessViewer::TechprocessViewer(Techprocess* tech, QWidget *parent)
     :QWidget(parent)
 {
     copyBuffer = QApplication::clipboard();
+    inputValidator = new InputNumberQValidator(this);
     generateGui(tech);  
 }
 
@@ -31,6 +33,7 @@ void TechprocessViewer::generateGui(Techprocess* tech)
     for (auto it = m_usedDependance.begin(); it != m_usedDependance.end(); ++it)
     {
         lineEdit = new QLineEdit();
+        lineEdit->setValidator(inputValidator);
         measure = new QLabel(*it);
         connect(lineEdit, &QLineEdit::editingFinished, this, [=](){
             QString inputText = lineEdit->text();
