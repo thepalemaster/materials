@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(projectName materialsQt)
+set(projectName mcalculator)
 
-project(${projectName} VERSION 0.4.0 LANGUAGES CXX)
+project(${projectName} VERSION 0.6.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -36,6 +36,7 @@ add_executable(${projectName}
     ${SRC_DIR}/gui_techlist.cpp
     ${SRC_DIR}/material_entry.cpp
     ${SRC_DIR}/inputnumberqvalidator.cpp
+    ${SRC_DIR}/img.qrc
 )
 
 target_include_directories(${projectName} PUBLIC  ${Qt5_INCLUDE_DIR})
