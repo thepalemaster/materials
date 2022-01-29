@@ -142,7 +142,7 @@ bool Parser::isOperation (const QString &operation)
         if ((operation[0].isDigit())&&
             (operation[1].isDigit())&&
             (operation[2].isDigit())&&
-            operation[3] == ' ')
+            operation[3] == QChar(' '))
             return true;
         else
             return false;

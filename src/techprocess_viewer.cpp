@@ -38,7 +38,7 @@ void TechprocessViewer::generateGui(Techprocess* tech)
         connect(lineEdit, &QLineEdit::editingFinished, this, [=](){
             QString inputText = lineEdit->text();
             int pos = inputText.indexOf(',');
-            if(pos != -1)//вероятно стоит использовать QLocale
+            if(pos != -1)
             {
                 inputText[pos] = '.';
             }

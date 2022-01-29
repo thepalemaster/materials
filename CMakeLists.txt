@@ -22,10 +22,12 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/winico.rc")
+
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
 
-add_executable(${projectName}
+add_executable(${projectName} WIN32
     ${SRC_DIR}/main.cpp
     ${SRC_DIR}/techprocess.cpp
     ${SRC_DIR}/operation.cpp
@@ -37,6 +39,7 @@ add_executable(${projectName}
     ${SRC_DIR}/material_entry.cpp
     ${SRC_DIR}/inputnumberqvalidator.cpp
     ${SRC_DIR}/img.qrc
+    ${app_icon_resource_windows}
 )
 
 target_include_directories(${projectName} PUBLIC  ${Qt5_INCLUDE_DIR})

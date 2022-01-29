@@ -12,6 +12,3 @@ QString  Measurement::getRegExpMeasure(const std::map<QString, Measure>& map)
     }
     return stringList.join("|");
 }
-
-//Measurement::regExpMeasure = getRegExpMeasure (measureMap);
-
